@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:15
+    container_name: gestion_gastos_db
+    environment:
+      POSTGRES_DB: gestion_gastos
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./bd.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gestion_network
+
+  # Aplicación FastAPI
+  api:
+    build: .
+    container_name: gestion_gastos_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://usuario:password@db:5432/gestion_gastos
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=gestion_gastos
+      - DB_USER=usuario
+      - DB_PASSWORD=password
+      - SECRET_KEY=tu_clave_secreta_muy_segura_aqui_cambiar_en_produccion
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - DEBUG=True
+    depends_on:
+      - db
+    networks:
+      - gestion_network
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
+
+networks:
+  gestion_network:
+    driver: bridge
