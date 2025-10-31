@@ -221,9 +221,458 @@
             "description": "Actualizar información del perfil del usuario"
           },
           "response": []
+        },
+        {
+          "name": "Eliminar Cuenta de Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "profile"]
+            },
+            "description": "Eliminar permanentemente la cuenta del usuario autenticado y todos sus datos relacionados"
+          },
+          "response": []
         }
       ],
       "description": "Endpoints para gestión de usuarios autenticados"
+    },
+    {
+      "name": "💰 Gestión de Ingresos",
+      "item": [
+        {
+          "name": "Crear Ingreso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Salario mensual\",\n  \"monto\": 1500000.00,\n  \"fecha\": \"2024-01-15\",\n  \"fuente\": \"Empresa XYZ\",\n  \"id_categoria\": 1,\n  \"id_grupo\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/incomes/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", ""]
+            },
+            "description": "Crear un nuevo ingreso personal o de grupo"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingresos Personales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0",
+                  "description": "Número de registros a omitir"
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "Número máximo de registros a devolver"
+                }
+              ]
+            },
+            "description": "Obtener todos los ingresos personales del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingreso Específico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/{{income_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "{{income_id}}"]
+            },
+            "description": "Obtener un ingreso específico por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingresos de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/group/{{group_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "group", "{{group_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener ingresos de un grupo específico (solo si el usuario pertenece al grupo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Ingreso",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Salario mensual actualizado\",\n  \"monto\": 1600000.00,\n  \"fuente\": \"Empresa XYZ - Actualización\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/incomes/{{income_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "{{income_id}}"]
+            },
+            "description": "Actualizar un ingreso específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Ingreso",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/{{income_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "{{income_id}}"]
+            },
+            "description": "Eliminar un ingreso específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Total de Ingresos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/total/amount",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "total", "amount"]
+            },
+            "description": "Obtener el total acumulado de ingresos del usuario"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingresos por Rango de Fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/date-range/?start_date=2024-01-01&end_date=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "date-range", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2024-01-01",
+                  "description": "Fecha de inicio (YYYY-MM-DD)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2024-12-31",
+                  "description": "Fecha de fin (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Obtener ingresos dentro de un rango de fechas específico"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión completa de ingresos personales y grupales"
+    },
+    {
+      "name": "📂 Gestión de Categorías",
+      "item": [
+        {
+          "name": "Crear Categoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comida\",\n  \"tipo\": \"gasto\",\n  \"color\": \"#FF5733\",\n  \"icono\": \"🍽️\",\n  \"es_global\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", ""]
+            },
+            "description": "Crear una nueva categoría (personal o global). Solo administradores pueden crear categorías globales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Categorías Disponibles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/?skip=0&limit=100&tipo=gasto",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0",
+                  "description": "Número de registros a omitir"
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "Número máximo de registros a devolver"
+                },
+                {
+                  "key": "tipo",
+                  "value": "gasto",
+                  "description": "Opcional: filtrar por tipo (ingreso o gasto)"
+                }
+              ]
+            },
+            "description": "Obtener categorías disponibles para el usuario (personales + globales), opcionalmente filtradas por tipo"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Categorías Personales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/personal?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "personal"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener solo las categorías personales del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Categorías Globales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categories/global?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "global"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener todas las categorías globales (disponibles para todos los usuarios)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Categoría Específica",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "{{category_id}}"]
+            },
+            "description": "Obtener una categoría específica por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Categoría",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comida Rápida\",\n  \"color\": \"#FF8C00\",\n  \"icono\": \"🍔\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "{{category_id}}"]
+            },
+            "description": "Actualizar una categoría. Solo el propietario puede actualizar categorías personales, solo administradores pueden actualizar globales."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Categoría",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "{{category_id}}"]
+            },
+            "description": "Eliminar una categoría. Solo el propietario puede eliminar categorías personales, solo administradores pueden eliminar globales. No se puede eliminar si está siendo usada."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Estadísticas de Categoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/categories/{{category_id}}/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categories", "{{category_id}}", "stats"]
+            },
+            "description": "Obtener estadísticas de uso de una categoría (total gastos, ingresos, cantidades)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión completa de categorías (personales y globales)"
     },
     {
       "name": "🧪 Tests de Errores",
@@ -401,6 +850,21 @@
       "key": "access_token",
       "value": "",
       "description": "Token JWT obtenido del login"
+    },
+    {
+      "key": "income_id",
+      "value": "1",
+      "description": "ID de un ingreso para pruebas"
+    },
+    {
+      "key": "group_id",
+      "value": "1",
+      "description": "ID de un grupo para pruebas"
+    },
+    {
+      "key": "category_id",
+      "value": "1",
+      "description": "ID de una categoría para pruebas"
     }
   ]
 }

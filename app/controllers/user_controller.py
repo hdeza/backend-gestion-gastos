@@ -29,11 +29,38 @@ async def update_user_profile(
     """
     user_service = UserService(db)
     updated_user = user_service.update_user(current_user.id_usuario, user_update)
-    
+
     if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado"
         )
-    
+
     return updated_user
+
+@router.delete("/profile")
+async def delete_user_account(
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Eliminar la cuenta del usuario autenticado y todos sus datos relacionados
+    """
+    user_service = UserService(db)
+
+    try:
+        success = user_service.delete_user(current_user.id_usuario)
+
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+
+        return {"message": "Cuenta eliminada exitosamente"}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al eliminar la cuenta: {str(e)}"
+        )
