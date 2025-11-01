@@ -7,7 +7,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM categorias WHERE es_global = TRUE LIMIT 1) THEN
-
+        
         -- Categorías de Gastos Globales
         INSERT INTO categorias (nombre, tipo, color, icono, es_global) VALUES
         ('Alimentación', 'gasto', '#FF6B6B', '🍽️', TRUE),
