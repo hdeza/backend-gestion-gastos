@@ -277,7 +277,7 @@
           "response": []
         },
         {
-          "name": "Obtener Ingresos Personales",
+          "name": "Obtener Ingresos del Usuario",
           "request": {
             "method": "GET",
             "header": [
@@ -288,7 +288,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/incomes/?skip=0&limit=100",
+              "raw": "{{base_url}}/api/incomes/?skip=0&limit=100&personal_only=false",
               "host": ["{{base_url}}"],
               "path": ["api", "incomes", ""],
               "query": [
@@ -301,10 +301,50 @@
                   "key": "limit",
                   "value": "100",
                   "description": "Número máximo de registros a devolver"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra ingresos personales (sin grupos)"
                 }
               ]
             },
-            "description": "Obtener todos los ingresos personales del usuario autenticado"
+            "description": "Obtener todos los ingresos del usuario (personales y de grupos). Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingresos Solo Personales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/?skip=0&limit=100&personal_only=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "true",
+                  "description": "Solo ingresos personales (sin grupos)"
+                }
+              ]
+            },
+            "description": "Obtener solo los ingresos personales del usuario (sin grupos)"
           },
           "response": []
         },
@@ -418,11 +458,38 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/incomes/total/amount",
+              "raw": "{{base_url}}/api/incomes/total/amount?personal_only=false",
               "host": ["{{base_url}}"],
-              "path": ["api", "incomes", "total", "amount"]
+              "path": ["api", "incomes", "total", "amount"],
+              "query": [
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo cuenta ingresos personales"
+                }
+              ]
             },
-            "description": "Obtener el total acumulado de ingresos del usuario"
+            "description": "Obtener el total acumulado de ingresos del usuario. Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Total de Ingresos de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/group/{{group_id}}/total/amount",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "group", "{{group_id}}", "total", "amount"]
+            },
+            "description": "Obtener el total acumulado de ingresos de un grupo específico"
           },
           "response": []
         },
@@ -438,9 +505,46 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/incomes/date-range/?start_date=2024-01-01&end_date=2024-12-31",
+              "raw": "{{base_url}}/api/incomes/date-range/?start_date=2024-01-01&end_date=2024-12-31&personal_only=false",
               "host": ["{{base_url}}"],
               "path": ["api", "incomes", "date-range", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2024-01-01",
+                  "description": "Fecha de inicio (YYYY-MM-DD)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2024-12-31",
+                  "description": "Fecha de fin (YYYY-MM-DD)"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra ingresos personales"
+                }
+              ]
+            },
+            "description": "Obtener ingresos dentro de un rango de fechas. Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Ingresos de Grupo por Rango de Fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/incomes/group/{{group_id}}/date-range/?start_date=2024-01-01&end_date=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "incomes", "group", "{{group_id}}", "date-range", ""],
               "query": [
                 {
                   "key": "start_date",
@@ -454,12 +558,1270 @@
                 }
               ]
             },
-            "description": "Obtener ingresos dentro de un rango de fechas específico"
+            "description": "Obtener ingresos de un grupo dentro de un rango de fechas específico"
           },
           "response": []
         }
       ],
       "description": "Endpoints para gestión completa de ingresos personales y grupales"
+    },
+    {
+      "name": "💸 Gestión de Gastos",
+      "item": [
+        {
+          "name": "Crear Gasto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Almuerzo en restaurante\",\n  \"monto\": 25000.00,\n  \"fecha\": \"2024-01-15\",\n  \"metodo_pago\": \"tarjeta\",\n  \"nota\": \"Almuerzo con amigos\",\n  \"recurrente\": false,\n  \"id_categoria\": 1,\n  \"id_grupo\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/expenses/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", ""]
+            },
+            "description": "Crear un nuevo gasto personal o de grupo"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos del Usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/?skip=0&limit=100&personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0",
+                  "description": "Número de registros a omitir"
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "Número máximo de registros a devolver"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra gastos personales (sin grupos)"
+                }
+              ]
+            },
+            "description": "Obtener todos los gastos del usuario (personales y de grupos). Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos Solo Personales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/?skip=0&limit=100&personal_only=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "true",
+                  "description": "Solo gastos personales (sin grupos)"
+                }
+              ]
+            },
+            "description": "Obtener solo los gastos personales del usuario (sin grupos)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gasto Específico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "{{expense_id}}"]
+            },
+            "description": "Obtener un gasto específico por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/group/{{group_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "group", "{{group_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener gastos de un grupo específico (solo si el usuario pertenece al grupo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos por Categoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/category/{{category_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "category", "{{category_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener gastos filtrados por categoría específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Gasto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Almuerzo en restaurante actualizado\",\n  \"monto\": 30000.00,\n  \"metodo_pago\": \"efectivo\",\n  \"nota\": \"Actualización del gasto\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "{{expense_id}}"]
+            },
+            "description": "Actualizar un gasto específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Gasto",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/{{expense_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "{{expense_id}}"]
+            },
+            "description": "Eliminar un gasto específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Total de Gastos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/total/amount?personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "total", "amount"],
+              "query": [
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo cuenta gastos personales"
+                }
+              ]
+            },
+            "description": "Obtener el total acumulado de gastos del usuario. Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Total de Gastos de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/group/{{group_id}}/total/amount",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "group", "{{group_id}}", "total", "amount"]
+            },
+            "description": "Obtener el total acumulado de gastos de un grupo específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos por Rango de Fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/date-range/?start_date=2024-01-01&end_date=2024-12-31&personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "date-range", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2024-01-01",
+                  "description": "Fecha de inicio (YYYY-MM-DD)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2024-12-31",
+                  "description": "Fecha de fin (YYYY-MM-DD)"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra gastos personales"
+                }
+              ]
+            },
+            "description": "Obtener gastos dentro de un rango de fechas. Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos de Grupo por Rango de Fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/group/{{group_id}}/date-range/?start_date=2024-01-01&end_date=2024-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "group", "{{group_id}}", "date-range", ""],
+              "query": [
+                {
+                  "key": "start_date",
+                  "value": "2024-01-01",
+                  "description": "Fecha de inicio (YYYY-MM-DD)"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2024-12-31",
+                  "description": "Fecha de fin (YYYY-MM-DD)"
+                }
+              ]
+            },
+            "description": "Obtener gastos de un grupo dentro de un rango de fechas específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos de Grupo por Categoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/group/{{group_id}}/category/{{category_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "group", "{{group_id}}", "category", "{{category_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener gastos de un grupo filtrados por categoría específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Gastos por Categoría (Actualizado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/expenses/category/{{category_id}}?skip=0&limit=100&personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "expenses", "category", "{{category_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra gastos personales"
+                }
+              ]
+            },
+            "description": "Obtener gastos filtrados por categoría. Use personal_only=true para solo personales."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión completa de gastos personales y grupales"
+    },
+    {
+      "name": "👥 Gestión de Grupos",
+      "item": [
+        {
+          "name": "Crear Grupo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Grupo de Viaje\",\n  \"descripcion\": \"Grupo para gestionar gastos del viaje a la playa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/groups/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", ""]
+            },
+            "description": "Crear un nuevo grupo. El creador se agrega automáticamente como administrador."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Mis Grupos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener todos los grupos a los que pertenece el usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Grupos Creados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/created?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "created"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener grupos creados por el usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Detalles de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}"]
+            },
+            "description": "Obtener detalles de un grupo específico (solo si el usuario pertenece al grupo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Grupo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Grupo de Viaje Actualizado\",\n  \"descripcion\": \"Nueva descripción del grupo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}"]
+            },
+            "description": "Actualizar un grupo (solo administradores pueden actualizar)"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Grupo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}"]
+            },
+            "description": "Eliminar un grupo (solo el creador puede eliminar)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Miembros del Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}", "members"]
+            },
+            "description": "Obtener miembros de un grupo (solo si el usuario pertenece al grupo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remover Miembro del Grupo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}/members/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}", "members", "{{user_id}}"]
+            },
+            "description": "Remover un miembro del grupo (solo administradores o el mismo usuario)"
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar Rol de Miembro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/groups/{{group_id}}/members/{{user_id}}/role?new_role=admin",
+              "host": ["{{base_url}}"],
+              "path": ["api", "groups", "{{group_id}}", "members", "{{user_id}}", "role"],
+              "query": [
+                {
+                  "key": "new_role",
+                  "value": "admin",
+                  "description": "Nuevo rol: 'admin' o 'miembro'"
+                }
+              ]
+            },
+            "description": "Cambiar el rol de un miembro (solo administradores pueden hacerlo)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión completa de grupos"
+    },
+    {
+      "name": "📨 Gestión de Invitaciones",
+      "item": [
+        {
+          "name": "Crear Invitación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_grupo\": 1,\n  \"id_usuario_invitado\": null,\n  \"dias_expiracion\": 7\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invitations/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", ""]
+            },
+            "description": "Crear una nueva invitación para un grupo. Solo los administradores pueden crear invitaciones."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Invitaciones de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invitations/group/{{group_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "group", "{{group_id}}"]
+            },
+            "description": "Obtener todas las invitaciones de un grupo (solo administradores)"
+          },
+          "response": []
+        },
+        {
+          "name": "Ver Invitación por Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/invitations/token/{{invitation_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "token", "{{invitation_token}}"]
+            },
+            "description": "Obtener detalles de una invitación por token. Este endpoint puede ser accedido sin autenticación."
+          },
+          "response": []
+        },
+        {
+          "name": "Generar QR de Invitación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invitations/{{invitation_id}}/qr",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "{{invitation_id}}", "qr"]
+            },
+            "description": "Generar código QR para una invitación (solo administradores del grupo). El QR contiene el link de invitación."
+          },
+          "response": []
+        },
+        {
+          "name": "Aceptar Invitación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitation_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invitations/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "accept"]
+            },
+            "description": "Aceptar una invitación y unirse al grupo"
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar Invitación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitation_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invitations/reject",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "reject"]
+            },
+            "description": "Rechazar una invitación"
+          },
+          "response": []
+        },
+        {
+          "name": "Revocar Invitación",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invitations/{{invitation_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invitations", "{{invitation_id}}"]
+            },
+            "description": "Revocar una invitación (solo administradores del grupo)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión de invitaciones a grupos con links y códigos QR"
+    },
+    {
+      "name": "🎯 Gestión de Metas",
+      "item": [
+        {
+          "name": "Crear Meta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ahorrar para viaje\",\n  \"monto_objetivo\": 5000000.00,\n  \"fecha_inicio\": \"2024-01-01\",\n  \"fecha_fin\": \"2024-12-31\",\n  \"estado\": \"activa\",\n  \"id_grupo\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/goals/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", ""]
+            },
+            "description": "Crear una nueva meta personal o grupal"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Metas del Usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/?skip=0&limit=100&personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra metas personales"
+                }
+              ]
+            },
+            "description": "Obtener todas las metas del usuario (personales y de grupos). Use personal_only=true para solo personales."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Metas Solo Personales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/?skip=0&limit=100&personal_only=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "personal_only",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Obtener solo las metas personales del usuario (sin grupos)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Metas de Grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/group/{{group_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "group", "{{group_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener metas de un grupo específico (solo si el usuario pertenece al grupo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Meta Específica",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/{{goal_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "{{goal_id}}"]
+            },
+            "description": "Obtener una meta específica con detalles de progreso"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Progreso de Meta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/{{goal_id}}/progress",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "{{goal_id}}", "progress"]
+            },
+            "description": "Obtener progreso detallado de una meta (porcentaje, faltante, etc.)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Metas por Estado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/status/activa?personal_only=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "status", "activa"],
+              "query": [
+                {
+                  "key": "personal_only",
+                  "value": "false",
+                  "description": "Si es true, solo muestra metas personales"
+                }
+              ]
+            },
+            "description": "Obtener metas filtradas por estado (activa, completada, cancelada)"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Meta",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ahorrar para viaje actualizado\",\n  \"monto_objetivo\": 6000000.00,\n  \"estado\": \"activa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/goals/{{goal_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "{{goal_id}}"]
+            },
+            "description": "Actualizar una meta específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Meta",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goals/{{goal_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goals", "{{goal_id}}"]
+            },
+            "description": "Eliminar una meta específica"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión completa de metas personales y grupales"
+    },
+    {
+      "name": "💰 Aportes a Metas",
+      "item": [
+        {
+          "name": "Crear Aporte a Meta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_meta\": 1,\n  \"monto\": 100000.00,\n  \"fecha\": \"2024-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", ""]
+            },
+            "description": "Crear un nuevo aporte a una meta. Solo se pueden hacer aportes a metas activas."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Aportes de una Meta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/goal/{{goal_id}}?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "goal", "{{goal_id}}"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener todos los aportes de una meta específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Aportes del Usuario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/user?skip=0&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "user"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Obtener todos los aportes del usuario autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Aportes de Usuario por Meta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/goal/{{goal_id}}/user/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "goal", "{{goal_id}}", "user", "{{user_id}}"]
+            },
+            "description": "Obtener aportes de un usuario específico a una meta"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Aporte Específico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/{{contribution_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "{{contribution_id}}"]
+            },
+            "description": "Obtener un aporte específico por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Total de Aportes de Meta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/goal/{{goal_id}}/total",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "goal", "{{goal_id}}", "total"]
+            },
+            "description": "Obtener el total acumulado de aportes de una meta"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Aporte",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 150000.00,\n  \"fecha\": \"2024-01-20\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/{{contribution_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "{{contribution_id}}"]
+            },
+            "description": "Actualizar un aporte específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Aporte",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "description": "Token JWT del usuario autenticado"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/goal-contributions/{{contribution_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "goal-contributions", "{{contribution_id}}"]
+            },
+            "description": "Eliminar un aporte específico"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints para gestión de aportes a metas personales y grupales"
     },
     {
       "name": "📂 Gestión de Categorías",
@@ -865,6 +2227,36 @@
       "key": "category_id",
       "value": "1",
       "description": "ID de una categoría para pruebas"
+    },
+    {
+      "key": "expense_id",
+      "value": "1",
+      "description": "ID de un gasto para pruebas"
+    },
+    {
+      "key": "group_id",
+      "value": "1",
+      "description": "ID de un grupo para pruebas"
+    },
+    {
+      "key": "invitation_id",
+      "value": "1",
+      "description": "ID de una invitación para pruebas"
+    },
+    {
+      "key": "invitation_token",
+      "value": "",
+      "description": "Token de invitación obtenido al crear una invitación"
+    },
+    {
+      "key": "goal_id",
+      "value": "1",
+      "description": "ID de una meta para pruebas"
+    },
+    {
+      "key": "contribution_id",
+      "value": "1",
+      "description": "ID de un aporte para pruebas"
     }
   ]
 }

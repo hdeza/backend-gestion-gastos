@@ -51,14 +51,16 @@ async def create_income(
 async def get_user_incomes(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
+    personal_only: bool = Query(False, description="Si es True, solo muestra ingresos personales (sin grupos)"),
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Obtener todos los ingresos del usuario autenticado
+    Obtener todos los ingresos del usuario autenticado.
+    Si personal_only=True, solo muestra ingresos personales (sin grupos).
     """
     income_service = IncomeService(db)
-    incomes = income_service.get_incomes_by_user(current_user.id_usuario, skip, limit)
+    incomes = income_service.get_incomes_by_user(current_user.id_usuario, skip, limit, personal_only)
     return incomes
 
 @router.get("/group/{group_id}", response_model=List[IngresoResponse])
@@ -154,26 +156,57 @@ async def delete_income(
 
 @router.get("/total/amount", response_model=dict)
 async def get_total_income(
+    personal_only: bool = Query(False, description="Si es True, solo cuenta ingresos personales"),
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Obtener el total de ingresos del usuario autenticado
+    Obtener el total de ingresos del usuario autenticado.
+    Si personal_only=True, solo cuenta ingresos personales (sin grupos).
     """
     income_service = IncomeService(db)
-    total = income_service.get_total_income_by_user(current_user.id_usuario)
+    total = income_service.get_total_income_by_user(current_user.id_usuario, personal_only)
 
     return {"total_ingresos": total}
+
+@router.get("/group/{group_id}/total/amount", response_model=dict)
+async def get_total_group_income(
+    group_id: int,
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener el total de ingresos de un grupo específico
+    """
+    income_service = IncomeService(db)
+    
+    # Verificar que el usuario pertenece al grupo
+    from app.models.user_group import UsuarioGrupo
+    user_in_group = db.query(UsuarioGrupo).filter(
+        UsuarioGrupo.id_usuario == current_user.id_usuario,
+        UsuarioGrupo.id_grupo == group_id
+    ).first()
+    
+    if not user_in_group:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No perteneces a este grupo"
+        )
+    
+    total = income_service.get_total_income_by_group(group_id, current_user.id_usuario)
+    return {"total_ingresos": total, "id_grupo": group_id}
 
 @router.get("/date-range/", response_model=List[IngresoResponse])
 async def get_incomes_by_date_range(
     start_date: str = Query(..., description="Fecha de inicio (YYYY-MM-DD)"),
     end_date: str = Query(..., description="Fecha de fin (YYYY-MM-DD)"),
+    personal_only: bool = Query(False, description="Si es True, solo muestra ingresos personales"),
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Obtener ingresos por rango de fechas
+    Obtener ingresos por rango de fechas.
+    Si personal_only=True, solo muestra ingresos personales (sin grupos).
     """
     try:
         # Validar formato de fechas
@@ -194,6 +227,53 @@ async def get_incomes_by_date_range(
         )
 
     income_service = IncomeService(db)
-    incomes = income_service.get_income_by_date_range(current_user.id_usuario, start_date, end_date)
+    incomes = income_service.get_income_by_date_range(current_user.id_usuario, start_date, end_date, personal_only)
 
+    return incomes
+
+@router.get("/group/{group_id}/date-range/", response_model=List[IngresoResponse])
+async def get_group_incomes_by_date_range(
+    group_id: int,
+    start_date: str = Query(..., description="Fecha de inicio (YYYY-MM-DD)"),
+    end_date: str = Query(..., description="Fecha de fin (YYYY-MM-DD)"),
+    current_user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener ingresos de un grupo por rango de fechas
+    """
+    try:
+        # Validar formato de fechas
+        from datetime import datetime
+        datetime.strptime(start_date, '%Y-%m-%d')
+        datetime.strptime(end_date, '%Y-%m-%d')
+
+        if start_date > end_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La fecha de inicio debe ser anterior a la fecha de fin"
+            )
+
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Formato de fecha inválido. Use YYYY-MM-DD"
+        )
+
+    income_service = IncomeService(db)
+    
+    # Verificar que el usuario pertenece al grupo
+    from app.models.user_group import UsuarioGrupo
+    user_in_group = db.query(UsuarioGrupo).filter(
+        UsuarioGrupo.id_usuario == current_user.id_usuario,
+        UsuarioGrupo.id_grupo == group_id
+    ).first()
+    
+    if not user_in_group:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No perteneces a este grupo"
+        )
+    
+    incomes = income_service.get_group_income_by_date_range(group_id, current_user.id_usuario, start_date, end_date)
     return incomes

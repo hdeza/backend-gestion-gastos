@@ -32,3 +32,5 @@ class Usuario(Base):
     historial_ai = relationship("HistorialAI", back_populates="usuario")
     aportes_metas = relationship("AporteMeta", back_populates="usuario")
     usuarios_grupos = relationship("UsuarioGrupo", back_populates="usuario")
+    invitaciones_creadas = relationship("Invitacion", foreign_keys="Invitacion.creado_por", back_populates="creador")
+    invitaciones_recibidas = relationship("Invitacion", foreign_keys="Invitacion.id_usuario_invitado", back_populates="usuario_invitado")

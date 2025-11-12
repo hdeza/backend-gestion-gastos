@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import engine, Base
 from app.core.config import settings
-from app.controllers import auth_controller, user_controller, income_controller, category_controller
+from app.controllers import auth_controller, user_controller, income_controller, category_controller, expense_controller, group_controller, invitation_controller, goal_controller, goal_contribution_controller
 
 # Crear la aplicación FastAPI
 app = FastAPI(
@@ -33,6 +33,11 @@ app.include_router(auth_controller.router, prefix="/api/auth", tags=["autenticac
 app.include_router(user_controller.router, prefix="/api/users", tags=["usuarios"])
 app.include_router(income_controller.router, prefix="/api/incomes", tags=["ingresos"])
 app.include_router(category_controller.router, prefix="/api/categories", tags=["categorías"])
+app.include_router(expense_controller.router, prefix="/api/expenses", tags=["gastos"])
+app.include_router(group_controller.router, prefix="/api/groups", tags=["grupos"])
+app.include_router(invitation_controller.router, prefix="/api/invitations", tags=["invitaciones"])
+app.include_router(goal_controller.router, prefix="/api/goals", tags=["metas"])
+app.include_router(goal_contribution_controller.router, prefix="/api/goal-contributions", tags=["aportes-metas"])
 
 @app.get("/")
 async def root():

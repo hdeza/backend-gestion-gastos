@@ -21,3 +21,4 @@ class Grupo(Base):
     ingresos = relationship("Ingreso", back_populates="grupo")
     metas_grupales = relationship("Meta", back_populates="grupo")
     usuarios_grupos = relationship("UsuarioGrupo", back_populates="grupo")
+    invitaciones = relationship("Invitacion", back_populates="grupo")

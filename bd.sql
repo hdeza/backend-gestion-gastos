@@ -35,6 +35,25 @@ CREATE TABLE usuarios_grupos (
 );
 
 -- =====================================
+-- TABLA INVITACIONES
+-- =====================================
+CREATE TABLE invitaciones (
+  id_invitacion SERIAL PRIMARY KEY,
+  id_grupo INT REFERENCES grupos(id_grupo) ON DELETE CASCADE NOT NULL,
+  token VARCHAR(64) UNIQUE NOT NULL,
+  creado_por INT REFERENCES usuarios(id_usuario) ON DELETE CASCADE NOT NULL,
+  id_usuario_invitado INT REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+  estado VARCHAR(20) DEFAULT 'pendiente' CHECK (estado IN ('pendiente','aceptada','rechazada','expirada')),
+  fecha_creacion TIMESTAMP DEFAULT NOW(),
+  fecha_expiracion TIMESTAMP,
+  fecha_aceptacion TIMESTAMP,
+  usado BOOLEAN DEFAULT FALSE
+);
+
+-- Índice para búsqueda rápida por token
+CREATE INDEX idx_invitaciones_token ON invitaciones(token);
+
+-- =====================================
 -- TABLA CATEGORIAS
 -- =====================================
 CREATE TABLE categorias (

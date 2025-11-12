@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # Configuración CORS
     ALLOWED_ORIGINS: list = ["*"]
     
+    # URL del frontend para links de invitación
+    FRONTEND_URL: str = "http://localhost:3000"
+    
     class Config:
         env_file = ".env"
         case_sensitive = True
